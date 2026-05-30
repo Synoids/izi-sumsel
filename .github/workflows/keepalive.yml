@@ -20,4 +20,10 @@ jobs:
           fi
           # Menghapus parameter query seperti ?pgbouncer=true karena psql tidak mendukungnya
           CLEAN_URL="${DATABASE_URL%%\?*}"
-          psql "$CLEAN_URL" -c "SELECT 1;"
+          
+          # Melakukan query yang lebih kompleks ke tabel asli agar aktivitas tercatat oleh Supabase
+          psql "$CLEAN_URL" -c "
+            SELECT 'Ping berhasil' as status, NOW() as waktu;
+            SELECT COUNT(*) as jumlah_user FROM users;
+            SELECT COUNT(*) as jumlah_artikel FROM articles;
+          "
