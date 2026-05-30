@@ -18,4 +18,6 @@ jobs:
             echo "Error: DATABASE_URL secret belum diatur di pengaturan repositori GitHub."
             exit 1
           fi
-          psql "$DATABASE_URL" -c "SELECT 1;"
+          # Menghapus parameter query seperti ?pgbouncer=true karena psql tidak mendukungnya
+          CLEAN_URL="${DATABASE_URL%%\?*}"
+          psql "$CLEAN_URL" -c "SELECT 1;"
