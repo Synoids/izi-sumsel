@@ -10,6 +10,9 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Ping Supabase Database
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -21,9 +24,14 @@ jobs:
           # Menghapus parameter query seperti ?pgbouncer=true karena psql tidak mendukungnya
           CLEAN_URL="${DATABASE_URL%%\?*}"
           
-          # Melakukan query yang lebih kompleks ke tabel asli agar aktivitas tercatat oleh Supabase
+          # Melakukan query ke sistem PostgreSQL agar tidak error jika tabel spesifik tidak ada
+          # Aktivitas ini cukup untuk dicatat oleh Supabase
           psql "$CLEAN_URL" -c "
             SELECT 'Ping berhasil' as status, NOW() as waktu;
-            SELECT COUNT(*) as jumlah_user FROM users;
-            SELECT COUNT(*) as jumlah_artikel FROM articles;
+            SELECT count(*) FROM pg_stat_user_tables;
           "
+
+      - name: Keep GitHub Actions Alive
+        uses: gautamkrishnar/keepalive-workflow@v2
+        with:
+          commit_message: "chore: keep github actions alive"
