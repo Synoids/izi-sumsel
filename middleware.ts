@@ -10,9 +10,9 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Jika belum login dan akses /admin, cek role admin
-  if (pathname.startsWith("/admin") && session?.user?.role !== "admin") {
-    return NextResponse.redirect(new URL("/login", req.url));
+  // Jika sudah login tapi bukan admin, redirect ke beranda agar tidak terjadi infinite loop
+  if (pathname.startsWith("/admin") && session?.user?.role !== "admin" && session?.user?.role !== "editor") {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   // Jika sudah login dan akses /login atau /register, redirect ke /admin
